@@ -3,8 +3,12 @@ package org.spring.democqrsaxon.command.controllers;
 import org.axonframework.commandhandling.gateway.CommandGateway;
 import org.spring.democqrsaxon.command.aggregates.AccountAggregate;
 import org.spring.democqrsaxon.command.commands.AddAccountCommand;
+import org.spring.democqrsaxon.command.commands.CreditAccountCommand;
+import org.spring.democqrsaxon.command.commands.DebitAccountCommand;
 import org.spring.democqrsaxon.command.commands.UpdateAccountStatusCommand;
 import org.spring.democqrsaxon.shared.dtos.AddNewAccountRequestDTO;
+import org.spring.democqrsaxon.shared.dtos.CreditAccountDTO;
+import org.spring.democqrsaxon.shared.dtos.DebitAccountDTO;
 import org.spring.democqrsaxon.shared.dtos.UpdateAccountStatusDTO;
 import org.springframework.web.bind.annotation.*;
 
