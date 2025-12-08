@@ -9,6 +9,7 @@ import org.axonframework.modelling.command.TargetAggregateIdentifier;
 public class AddAccountCommand {
     @TargetAggregateIdentifier
     private String id;
-    private double intialBalance;
+    private double initialBalance;
     private String currency;
+
 }
