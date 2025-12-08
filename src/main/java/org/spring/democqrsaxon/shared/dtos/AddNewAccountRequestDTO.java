@@ -1,4 +1,4 @@
-package org.spring.democqrsaxon.command.dtos;
+package org.spring.democqrsaxon.shared.dtos;
 
 public record AddNewAccountRequestDTO (double intialBalance ,String currency) {
 }
