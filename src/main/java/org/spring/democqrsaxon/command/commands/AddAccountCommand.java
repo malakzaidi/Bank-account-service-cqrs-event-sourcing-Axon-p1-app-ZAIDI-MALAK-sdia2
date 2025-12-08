@@ -1,0 +1,14 @@
+package org.spring.democqrsaxon.command.commands;
+
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import org.axonframework.modelling.command.TargetAggregateIdentifier;
+
+@Getter
+@AllArgsConstructor
+public class AddAccountCommand {
+    @TargetAggregateIdentifier
+    private String id;
+    private double intialBalance;
+    private String currency;
+}
