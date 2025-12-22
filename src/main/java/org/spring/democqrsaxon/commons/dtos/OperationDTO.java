@@ -1,7 +1,8 @@
-package org.spring.democqrsaxon.shared.dtos;
+package org.spring.democqrsaxon.commons.dtos;
 
 
 import lombok.*;
+import org.spring.democqrsaxon.query.entities.OperationType;
 
 import java.time.Instant;
 

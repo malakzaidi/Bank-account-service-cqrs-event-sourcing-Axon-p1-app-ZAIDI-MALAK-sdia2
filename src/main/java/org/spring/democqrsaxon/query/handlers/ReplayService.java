@@ -13,7 +13,7 @@ public class ReplayService {
     private EventProcessingConfiguration eventProcessingConfiguration;
 
     public void reply(){
-        String name="net.youssfi.demoaxon.query.handlers";
+        String name="org/spring/democqrsaxon/query/handlers";
         eventProcessingConfiguration.eventProcessor(name, TrackingEventProcessor.class)
                 .ifPresent(processor->{
                     processor.shutDown();

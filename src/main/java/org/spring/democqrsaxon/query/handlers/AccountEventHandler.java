@@ -10,11 +10,10 @@ import org.spring.democqrsaxon.query.entities.Operation;
 import org.spring.democqrsaxon.query.entities.OperationType;
 import org.spring.democqrsaxon.query.repository.AccountRepository;
 import org.spring.democqrsaxon.query.repository.OperationRepository;
-import org.spring.democqrsaxon.shared.events.AccountCreatedEvent;
-import org.spring.democqrsaxon.shared.events.AccountCreditedEvent;
-import org.spring.democqrsaxon.shared.events.AccountDebitedEvent;
-import org.spring.democqrsaxon.shared.events.AccountStatusUpdatedEvent;
-import org.springframework.stereotype.Component;
+import org.spring.democqrsaxon.commons.events.AccountCreatedEvent;
+import org.spring.democqrsaxon.commons.events.AccountCreditedEvent;
+import org.spring.democqrsaxon.commons.events.AccountDebitedEvent;
+import org.spring.democqrsaxon.commons.events.AccountStatusUpdatedEvent;
 import org.springframework.stereotype.Service;
 
 @Service

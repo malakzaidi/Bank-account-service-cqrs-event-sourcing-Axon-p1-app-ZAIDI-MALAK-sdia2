@@ -5,11 +5,10 @@ import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
 import lombok.*;
-import org.spring.democqrsaxon.shared.enums.AccountStatus;
+import org.spring.democqrsaxon.commons.enums.AccountStatus;
 
 
 import java.time.Instant;
-import java.time.LocalDate;
 
 @Entity
 @Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder

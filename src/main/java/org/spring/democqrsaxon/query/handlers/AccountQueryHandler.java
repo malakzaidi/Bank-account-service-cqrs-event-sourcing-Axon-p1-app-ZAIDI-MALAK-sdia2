@@ -5,9 +5,12 @@ import org.axonframework.queryhandling.QueryHandler;
 import org.spring.democqrsaxon.query.dtos.AccountEvent;
 import org.spring.democqrsaxon.query.entities.Account;
 import org.spring.democqrsaxon.query.entities.Operation;
+import org.spring.democqrsaxon.query.queries.GetAccountStatement;
+import org.spring.democqrsaxon.query.queries.GetAllAccounts;
+import org.spring.democqrsaxon.query.queries.WatchEventQuery;
 import org.spring.democqrsaxon.query.repository.AccountRepository;
 import org.spring.democqrsaxon.query.repository.OperationRepository;
-import org.spring.democqrsaxon.shared.dtos.AccountStatement;
+import org.spring.democqrsaxon.commons.dtos.AccountStatement;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

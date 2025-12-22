@@ -1,15 +1,16 @@
 package org.spring.democqrsaxon.command.controllers;
 
 import org.axonframework.commandhandling.gateway.CommandGateway;
+import org.axonframework.eventsourcing.eventstore.EventStore;
 import org.spring.democqrsaxon.command.aggregates.AccountAggregate;
-import org.spring.democqrsaxon.command.commands.AddAccountCommand;
+import org.spring.democqrsaxon.command.commands.CreateAccountCommand;
 import org.spring.democqrsaxon.command.commands.CreditAccountCommand;
 import org.spring.democqrsaxon.command.commands.DebitAccountCommand;
 import org.spring.democqrsaxon.command.commands.UpdateAccountStatusCommand;
-import org.spring.democqrsaxon.shared.dtos.AddNewAccountRequestDTO;
-import org.spring.democqrsaxon.shared.dtos.CreditAccountDTO;
-import org.spring.democqrsaxon.shared.dtos.DebitAccountDTO;
-import org.spring.democqrsaxon.shared.dtos.UpdateAccountStatusDTO;
+import org.spring.democqrsaxon.commons.dtos.CreateAccountDTO;
+import org.spring.democqrsaxon.commons.dtos.CreditAccountDTO;
+import org.spring.democqrsaxon.commons.dtos.DebitAccountDTO;
+import org.spring.democqrsaxon.commons.dtos.UpdateAccountStatusDTO;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
@@ -20,24 +21,23 @@ import java.util.stream.Stream;
 @RequestMapping("/commands/accounts")
 public class AccountCommandController {
     private CommandGateway commandGateway;
+    private EventStore eventStore;
+    private AccountAggregate accountAggregate;
 
-    public AccountCommandController(CommandGateway commandGateway) {
+    public AccountCommandController(CommandGateway commandGateway, EventStore eventStore, AccountAggregate accountAggregate) {
         this.commandGateway = commandGateway;
+        this.eventStore = eventStore;
+        this.accountAggregate = accountAggregate;
     }
 
-    @PostMapping("/add")
-    public CompletableFuture addNewAccount(@RequestBody AddNewAccountRequestDTO request) {
-        CompletableFuture<String> response = commandGateway.send(new AddAccountCommand(
+    @PostMapping("/create")
+    public CompletableFuture<String> createAccount(@RequestBody CreateAccountDTO request){
+        CompletableFuture<String> result = this.commandGateway.send(new CreateAccountCommand(
                 UUID.randomUUID().toString(),
-                request.intialBalance(),
+                request.initialBalance(),
                 request.currency()
         ));
-        return response;
-    }
-
-    @ExceptionHandler(Exception.class)
-    public String exceptionHandler(Exception exception) {
-        return exception.getMessage();
+        return result;
     }
     @PostMapping("/debit")
     public CompletableFuture<String> debitAccount(@RequestBody DebitAccountDTO request){
@@ -63,6 +63,11 @@ public class AccountCommandController {
         ));
         return result;
     }
+    @ExceptionHandler(Exception.class)
+    public String exceptionHandler(Exception  exception){
+        return exception.getMessage();
+    }
+
     @GetMapping("/events/{accountId}")
     public Stream eventStore(@PathVariable String accountId){
         return eventStore.readEvents(accountId).asStream();

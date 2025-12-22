@@ -1,4 +1,4 @@
-package org.spring.democqrsaxon.shared.dtos;
+package org.spring.democqrsaxon.commons.dtos;
 
 public record CreditAccountDTO(String accountId, double amount) {
 }

@@ -1,6 +1,5 @@
 package org.spring.democqrsaxon.query.controllers;
 
-import org.axonframework.eventhandling.EventMessage;
 import org.axonframework.messaging.responsetypes.ResponseTypes;
 import org.axonframework.queryhandling.QueryGateway;
 import org.axonframework.queryhandling.SubscriptionQueryResult;
@@ -8,7 +7,8 @@ import org.spring.democqrsaxon.query.dtos.AccountEvent;
 import org.spring.democqrsaxon.query.entities.Account;
 import org.spring.democqrsaxon.query.queries.GetAccountStatement;
 import org.spring.democqrsaxon.query.queries.GetAllAccounts;
-import org.spring.democqrsaxon.shared.dtos.AccountStatement;
+import org.spring.democqrsaxon.query.queries.WatchEventQuery;
+import org.spring.democqrsaxon.commons.dtos.AccountStatement;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
@@ -16,7 +16,6 @@ import reactor.core.publisher.Flux;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Flow;
 
 @RestController
 @RequestMapping("/query/accounts")

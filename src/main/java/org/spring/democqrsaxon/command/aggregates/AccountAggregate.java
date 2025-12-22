@@ -1,42 +1,51 @@
 package org.spring.democqrsaxon.command.aggregates;
 
 
+import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.axonframework.commandhandling.CommandHandler;
 import org.axonframework.eventsourcing.EventSourcingHandler;
 import org.axonframework.modelling.command.AggregateIdentifier;
 import org.axonframework.modelling.command.AggregateLifecycle;
 import org.axonframework.spring.stereotype.Aggregate;
-import org.spring.democqrsaxon.command.commands.AddAccountCommand;
+import org.spring.democqrsaxon.command.commands.CreateAccountCommand;
 import org.spring.democqrsaxon.command.commands.CreditAccountCommand;
 import org.spring.democqrsaxon.command.commands.DebitAccountCommand;
 import org.spring.democqrsaxon.command.commands.UpdateAccountStatusCommand;
-import org.spring.democqrsaxon.shared.enums.AccountStatus;
-import org.spring.democqrsaxon.shared.events.AccountCreatedEvent;
-import org.spring.democqrsaxon.shared.events.AccountCreditedEvent;
-import org.spring.democqrsaxon.shared.events.AccountDebitedEvent;
-import org.spring.democqrsaxon.shared.events.AccountStatusUpdatedEvent;
+import org.spring.democqrsaxon.commons.enums.AccountStatus;
+import org.spring.democqrsaxon.commons.events.AccountCreatedEvent;
+import org.spring.democqrsaxon.commons.events.AccountCreditedEvent;
+import org.spring.democqrsaxon.commons.events.AccountDebitedEvent;
+import org.spring.democqrsaxon.commons.events.AccountStatusUpdatedEvent;
 
 @Aggregate
+//@Entity
 @Slf4j
+@Getter
+@Setter
 public class AccountAggregate {
     @AggregateIdentifier
-    private String accountId;
-    private double balance;
+    //@Id
+    private String accountId ;
+    private double currentBalance;
+    private String currency;
     private AccountStatus status;
 
-    public AccountAggregate() {}
 
+    public AccountAggregate() {
+        log.info("Account Aggregate Created");
+    }
 
     @CommandHandler
-    public AccountAggregate(AddAccountCommand command) {
-        log.info("[CommandHandler] Received AddAccountCommand");
-        if (command.getInitialBalance()<=0) throw new IllegalArgumentException("initial balance must be positive");
+    public AccountAggregate(CreateAccountCommand command) {
+        log.info("CreateAccount Command Received");
+        if (command.getInitialBalance()<0) throw  new IllegalArgumentException("Balance negative exception");
         AggregateLifecycle.apply(new AccountCreatedEvent(
                 command.getId(),
                 command.getInitialBalance(),
-                AccountStatus.CREATED,
-                command.getCurrency()
+                command.getCurrency(),
+                AccountStatus.CREATED
         ));
 
     }
@@ -44,7 +53,7 @@ public class AccountAggregate {
     @CommandHandler
     public void handleCommand(DebitAccountCommand command){
         log.info("DebitAccountCommand Command Received");
-        if (!this.getAmount().equals(AccountStatus.ACTIVATED)) throw  new RuntimeException("This account can not be debited because of the account is not activated. The current status is "+status);
+        if (!this.getStatus().equals(AccountStatus.ACTIVATED)) throw  new RuntimeException("This account can not be debited because of the account is not activated. The current status is "+status);
         if (command.getAmount()>currentBalance) throw  new RuntimeException("Balance not sufficient exception");
         AggregateLifecycle.apply(new AccountDebitedEvent(
                 command.getId(),
@@ -71,11 +80,13 @@ public class AccountAggregate {
         ));
     }
     @EventSourcingHandler
-    public void on(AccountCreatedEvent event) {
-        log.info("[EventSourcingHandler] Received AccountCreatedEvent");
-        this.accountId = event.getAccountId();
-        this.balance = event.getInitialBalance();
-        this.status = event.getStatus();
+    //@EventHandler
+    public void on(AccountCreatedEvent event){
+        log.info("AccountCreatedEvent occured");
+        this.accountId =event.accountId();
+        this.currentBalance = event.initialBalance();
+        this.currency = event.currency();
+        this.status = event.accountStatus();
     }
     @EventSourcingHandler
     //@EventHandler
