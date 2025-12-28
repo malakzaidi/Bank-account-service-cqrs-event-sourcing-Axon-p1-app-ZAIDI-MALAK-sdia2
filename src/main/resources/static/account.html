@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestion de Comptes Bancaires - Démo CQRS Axon</title>
+
+    <!-- Chargement de la police Lora depuis Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Lora', serif;
+            background-color: #f8f5f2;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        h1, h2 {
+            text-align: center;
+            color: #2c3e50;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        form {
+            margin-bottom: 40px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background: #fafafa;
+        }
+        label {
+            display: block;
+            margin: 10px 0 5px;
+            font-weight: 600;
+        }
+        input, select {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-family: 'Lora', serif;
+            font-size: 16px;
+        }
+        button {
+            background: #2c3e50;
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+        }
+        button:hover {
+            background: #1a2530;
+        }
+        #response {
+            margin-top: 20px;
+            padding: 15px;
+            background: #e8f4fd;
+            border-radius: 4px;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Gestion de Comptes Bancaires</h1>
+    <p style="text-align:center;">Démo CQRS avec Axon Framework</p>
+
+    <!-- Créer un compte -->
+    <h2>Créer un nouveau compte</h2>
+    <form id="createForm">
+        <label>Solde initial</label>
+        <input type="number" id="initialBalance" placeholder="Ex: 1000" required>
+
+        <label>Devise</label>
+        <input type="text" id="currency" placeholder="Ex: EUR" value="EUR" required>
+
+        <button type="submit">Créer le compte</button>
+    </form>
+
+    <!-- Créditer -->
+    <h2>Créditer un compte</h2>
+    <form id="creditForm">
+        <label>ID du compte</label>
+        <input type="text" id="creditAccountId" required>
+
+        <label>Montant</label>
+        <input type="number" id="creditAmount" required>
+
+        <button type="submit">Créditer</button>
+    </form>
+
+    <!-- Débiter -->
+    <h2>Débiter un compte</h2>
+    <form id="debitForm">
+        <label>ID du compte</label>
+        <input type="text" id="debitAccountId" required>
+
+        <label>Montant</label>
+        <input type="number" id="debitAmount" required>
+
+        <button type="submit">Débiter</button>
+    </form>
+
+    <!-- Mettre à jour le statut -->
+    <h2>Mettre à jour le statut</h2>
+    <form id="statusForm">
+        <label>ID du compte</label>
+        <input type="text" id="statusAccountId" required>
+
+        <label>Nouveau statut</label>
+        <select id="accountStatus">
+            <option value="CREATED">CREATED</option>
+            <option value="ACTIVATED">ACTIVATED</option>
+            <option value="SUSPENDED">SUSPENDED</option>
+            <option value="CLOSED">CLOSED</option>
+        </select>
+
+        <button type="submit">Mettre à jour</button>
+    </form>
+
+    <div id="response"></div>
+</div>
+
+<script>
+    const baseUrl = '/commands/accounts';
+    const responseDiv = document.getElementById('response');
+
+    document.getElementById('createForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const data = {
+            initialBalance: parseFloat(document.getElementById('initialBalance').value),
+            currency: document.getElementById('currency').value
+        };
+        await sendRequest(`${baseUrl}/create`, data, 'Compte créé ! ID retourné :');
+    });
+
+    document.getElementById('creditForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const data = {
+            accountId: document.getElementById('creditAccountId').value,
+            amount: parseFloat(document.getElementById('creditAmount').value)
+        };
+        await sendRequest(`${baseUrl}/credit`, data, 'Compte crédité !');
+    });
+
+    document.getElementById('debitForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const data = {
+            accountId: document.getElementById('debitAccountId').value,
+            amount: parseFloat(document.getElementById('debitAmount').value)
+        };
+        await sendRequest(`${baseUrl}/debit`, data, 'Compte débité !');
+    });
+
+    document.getElementById('statusForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const data = {
+            accountId: document.getElementById('statusAccountId').value,
+            accountStatus: document.getElementById('accountStatus').value
+        };
+        await sendRequest(`${baseUrl}/updateStatus`, data, 'Statut mis à jour !');
+    });
+
+    async function sendRequest(url, data, successMsg) {
+        try {
+            const res = await fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+            const text = await res.text();
+            responseDiv.textContent = res.ok ? `${successMsg}\n${text}` : `Erreur : ${text || res.statusText}`;
+            responseDiv.style.background = res.ok ? '#d4edda' : '#f8d7da';
+        } catch (err) {
+            responseDiv.textContent = `Erreur réseau : ${err.message}`;
+            responseDiv.style.background = '#f8d7da';
+        }
+    }
+</script>
+</body>
+</html>
